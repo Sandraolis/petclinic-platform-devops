@@ -1,0 +1,43 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracing-server
+  labels:
+    app.kubernetes.io/name: tracing-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracing-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracing-server
+    spec:
+      containers:
+        - name: zipkin
+          image: "{{ .Values.tracing.image }}:{{ .Values.tracing.tag }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.tracing.port }}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracing-server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: tracing-server
+  ports:
+    - name: http
+      port: {{ .Values.tracing.port }}
+      targetPort: http
+{{- end }}

@@ -59,3 +59,16 @@ package-lock.json
 *.bak
 *.log
 tmp/
+
+# Terraform local files and sensitive state
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+
+# Local Claude settings
+.claude/settings.local.json

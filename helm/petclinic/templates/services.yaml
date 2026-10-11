@@ -1,0 +1,85 @@
+{{- $root := . }}
+{{- range $name, $config := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/part-of: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ $name }}
+        app.kubernetes.io/part-of: petclinic
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: "{{ $root.Values.aws.accountId }}.dkr.ecr.{{ $root.Values.aws.region }}.amazonaws.com/petclinic-dev-{{ $name }}:{{ $root.Values.image.tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $config.port }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ $config.profile | quote }}
+            - name: CONFIG_SERVER_URL
+              value: "http://config-server:8888"
+          {{- if eq $name "genai-service" }}
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $root.Values.genai.secretName }}
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: AZURE_OPENAI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $root.Values.genai.secretName }}
+                  key: AZURE_OPENAI_KEY
+                  optional: true
+            - name: AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $root.Values.genai.secretName }}
+                  key: AZURE_OPENAI_ENDPOINT
+                  optional: true
+          {{- end }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $config.port }}
+      targetPort: http
+{{- end }}

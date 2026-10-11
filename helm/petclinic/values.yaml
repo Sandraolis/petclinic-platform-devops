@@ -1,0 +1,42 @@
+aws:
+  accountId: "520235901263"
+  region: eu-central-1
+
+image:
+  tag: latest
+  pullPolicy: IfNotPresent
+
+services:
+  config-server:
+    port: 8888
+    profile: docker
+  discovery-server:
+    port: 8761
+    profile: docker
+  customers-service:
+    port: 8081
+    profile: docker
+  visits-service:
+    port: 8082
+    profile: docker
+  vets-service:
+    port: 8083
+    profile: docker
+  genai-service:
+    port: 8084
+    profile: docker
+  api-gateway:
+    port: 8080
+    profile: docker
+  admin-server:
+    port: 9090
+    profile: docker
+
+tracing:
+  enabled: true
+  image: openzipkin/zipkin
+  tag: latest
+  port: 9411
+
+genai:
+  secretName: petclinic-genai-secret

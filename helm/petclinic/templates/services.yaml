@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: {{ $name }}
     app.kubernetes.io/part-of: petclinic
 spec:
-  replicas: 1
+  replicas: {{ index $root.Values.replicaCount $name }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ $name }}

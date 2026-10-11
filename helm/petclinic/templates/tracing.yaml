@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: tracing-server
 spec:
-  replicas: 1
+  replicas: {{ .Values.tracing.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: tracing-server

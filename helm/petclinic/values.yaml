@@ -40,3 +40,15 @@ tracing:
 
 genai:
   secretName: petclinic-genai-secret
+replicaCount:
+  config-server: 1
+  discovery-server: 1
+  api-gateway: 1
+  customers-service: 1
+  visits-service: 1
+  vets-service: 1
+  genai-service: 0
+  admin-server: 0
+
+tracing:
+  replicaCount: 0

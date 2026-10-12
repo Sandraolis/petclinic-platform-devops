@@ -49,5 +49,5 @@ replicaCount:
   customers-service: 1
   visits-service: 1
   vets-service: 1
-  genai-service: 0
-  admin-server: 0
+  genai-service: 1
+  admin-server: 1

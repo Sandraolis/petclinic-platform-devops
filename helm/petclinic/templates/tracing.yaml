@@ -15,9 +15,17 @@ spec:
       labels:
         app.kubernetes.io/name: tracing-server
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: zipkin
           image: "{{ .Values.tracing.image }}:{{ .Values.tracing.tag }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: {{ .Values.tracing.port }}

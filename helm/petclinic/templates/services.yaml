@@ -19,10 +19,18 @@ spec:
         app.kubernetes.io/name: {{ $name }}
         app.kubernetes.io/part-of: petclinic
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: {{ $name }}
           image: "{{ $root.Values.aws.accountId }}.dkr.ecr.{{ $root.Values.aws.region }}.amazonaws.com/petclinic-dev-{{ $name }}:{{ $root.Values.image.tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: {{ $config.port }}

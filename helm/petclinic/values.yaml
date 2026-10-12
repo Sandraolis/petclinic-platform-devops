@@ -51,6 +51,3 @@ replicaCount:
   vets-service: 1
   genai-service: 0
   admin-server: 0
-
-tracing:
-  replicaCount: 0

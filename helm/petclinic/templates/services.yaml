@@ -75,7 +75,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ $name }}
 spec:
-  type: ClusterIP
+  type: {{ $config.type | default "ClusterIP" }}
   selector:
     app.kubernetes.io/name: {{ $name }}
   ports:

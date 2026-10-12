@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: petclinic-fluent-bit
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://fluent.github.io/helm-charts
+    chart: fluent-bit
+    targetRevision: 0.54.0
+    helm:
+      releaseName: petclinic-fluent-bit
+      values: |
+        kind: DaemonSet
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+
+        config:
+          service: |
+            [SERVICE]
+                Daemon Off
+                Flush 1
+                Log_Level info
+                Parsers_File parsers.conf
+
+          inputs: |
+            [INPUT]
+                Name tail
+                Path /var/log/containers/*.log
+                Tag kube.*
+                multiline.parser docker, cri
+                Mem_Buf_Limit 5MB
+                Skip_Long_Lines On
+
+          filters: |
+            [FILTER]
+                Name kubernetes
+                Match kube.*
+                Merge_Log On
+                Keep_Log Off
+                K8S-Logging.Parser On
+                K8S-Logging.Exclude On
+
+          outputs: |
+            [OUTPUT]
+                Name stdout
+                Match kube.*
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

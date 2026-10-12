@@ -38,6 +38,7 @@ tracing:
   image: openzipkin/zipkin
   tag: latest
   port: 9411
+  replicaCount: 1
 
 genai:
   secretName: petclinic-genai-secret
